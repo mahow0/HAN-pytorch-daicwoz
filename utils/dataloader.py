@@ -1,6 +1,11 @@
+import sys
+sys.path.insert(1, '/content/HAN-pytorch-daicwoz/utils')
+sys.path.insert(1, '/content/HAN-pytorch-daicwoz/src')
+
+
 import gensim.models.keyedvectors
-from src.dataset import HAN_Dataset
-from utils.tokenizer import collate_documents
+from dataset import HAN_Dataset
+from tokenizer import collate_documents
 from torch.utils.data import DataLoader
 
 def get_dataloader(dataset : HAN_Dataset, data_params : dict, model : gensim.models.keyedvectors.KeyedVectors):

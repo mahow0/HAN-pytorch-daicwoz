@@ -1,8 +1,12 @@
+import sys
+sys.path.insert(1, '/content/HAN-pytorch-daicwoz/utils')
+sys.path.insert(1, '/content/HAN-pytorch-daicwoz/src')
+
 import torch
 import torch.nn as nn
 import gensim
 import gensim.downloader
-import utils.tokenizer
+import tokenizer
 import numpy as np
 from icecream import ic
 

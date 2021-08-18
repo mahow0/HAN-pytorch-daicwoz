@@ -1,12 +1,16 @@
-import os
+#import os
 #os.environ['CUDA_LAUNCH_BLOCKING'] = '1'
+import sys
+sys.path.insert(1, '/content/HAN-pytorch-daicwoz/utils')
+sys.path.insert(1, '/content/HAN-pytorch-daicwoz/src')
+
 from evaluate import evaluate
 from train import *
 from transformers import AutoTokenizer
-from utils.daicwoz_dataloader import get_daicwoz_dataloader, get_daicwoz_dataset
-from utils.embeddings import get_pretrained_word2vec, get_pretrained_glove, GensimEmbedder
+from daicwoz_dataloader import get_daicwoz_dataloader, get_daicwoz_dataset
+from embeddings import get_pretrained_word2vec, get_pretrained_glove, GensimEmbedder
 from model import HAN
-from utils.tokenizer import collate_documents
+from tokenizer import collate_documents
 
 import torch
 import torch.nn as nn
@@ -67,7 +71,7 @@ if __name__ == '__main__':
     parser.add_argument('--val_csv_path', type = str, nargs='?', required=True, help='Path to validation set CSV')
     parser.add_argument('--eval_csv_path', type = str, nargs='?', required=True, help = 'Path to evaluation set CSV')
     parser.add_argument('--transcript_path', type = str, nargs='?', required=True, help='Path to folder where clinical transcripts are stored')
-    parser.add_argument('--lr', type = float, nargs='?', default = 0.005, help='Learning rate')
+    parser.add_argument('--lr', type = float, nargs='?', default = 0.05, help='Learning rate')
     parser.add_argument('--num_epochs', type = int, nargs= '?', default = 40, help = 'Number of epochs')
     parser.add_argument('--cuda', type = bool,nargs='?', default=True, help='Enable GPU acceleration if available')
 
@@ -81,11 +85,11 @@ if __name__ == '__main__':
         device = torch.device("cpu")
 
     print(device)
-    train_set_params = {'batch_size': 6, 'shuffle': True, 'num_workers': 0, 'pin_memory':True}
+    train_set_params = {'batch_size': 8, 'shuffle': True, 'num_workers': 0, 'pin_memory':True}
     eval_set_params = {'num_workers': 0}
 
     embedder = GensimEmbedder(embedding_model).to(device)
-    model_config = {'num_classes':2, 'embed_dim':embedding_model.vector_size, 'hidden_dim': 128, 'attn_dim':256, 'num_layers':1, 'dropout':0.25, 'embedder': embedder}
+    model_config = {'num_classes':2, 'embed_dim':embedding_model.vector_size, 'hidden_dim': 128, 'attn_dim':256, 'num_layers':2, 'dropout':0.25, 'embedder': embedder}
 
     train_set = get_daicwoz_dataloader(args.train_csv_path, args.transcript_path, train_set_params, embedding_model)
     val_set =  get_daicwoz_dataloader(args.val_csv_path, args.transcript_path, eval_set_params, embedding_model)

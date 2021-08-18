@@ -1,5 +1,9 @@
-from src.daicwoz_dataset import DAICWOZ_Dataset
-from utils.dataloader import get_dataloader
+import sys
+sys.path.insert(1, '/content/HAN-pytorch-daicwoz/utils')
+sys.path.insert(1, '/content/HAN-pytorch-daicwoz/src')
+
+from daicwoz_dataset import DAICWOZ_Dataset
+from dataloader import get_dataloader
 
 
 def get_daicwoz_dataset(csv_path, transcript_path, dataloader_params, model, label_name = 'PHQ8_Binary', oversample_minority = False):
