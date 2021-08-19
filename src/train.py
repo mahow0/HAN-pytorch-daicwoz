@@ -21,6 +21,7 @@ def train(
     # Set the model to training mode and fix the upper bound on gradient norm
     model.train()
     max_grad_norm = 1
+    log_softmax = nn.LogSoftmax()
 
     # Obtain the number of training examples
     num_batches = len(training_set)
@@ -34,7 +35,9 @@ def train(
 
             # Separate the batch into input_ids and attention_mask
             input_ids, attention_mask, labels = batch
-
+            #ic('---INPUT SIZES---')
+            #ic(f'INPUT IDS: {input_ids.size()}')
+            #ic(f'ATTENTION_MASK  : {attention_mask.size()}' )
             input_ids = input_ids.to(device)
             attention_mask = attention_mask.to(device)
             labels = torch.Tensor(labels).to(device)
@@ -53,6 +56,9 @@ def train(
             output = model(input_ids, attention_mask)
             # Calculate and backpropagate loss, clip gradient norm
             output = output.squeeze(1)
+            logits = log_softmax(output)
+            #ic(torch.max(logits,dim=1,keepdim=True)[1])
+            #ic(labels)
             loss = loss_fn(output, labels.long())
             #ic(output)
            # ic(labels)

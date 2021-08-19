@@ -32,7 +32,7 @@ class HAN(nn.Module):
         self.sentence_encoder = SentenceEncoder(embed_dim=embed_dim, hidden_dim=hidden_dim, num_layers=num_layers,
                                                 dropout=dropout, attn_dim=attn_dim, embedder=embedder)
 
-        self.classifier = nn.Linear(attn_dim, num_classes, bias=True)
+        self.classifier = nn.Linear(2 * hidden_dim, num_classes, bias=True)
 
 
 
@@ -47,11 +47,14 @@ class HAN(nn.Module):
 
         document_encoding = []
         for sentence, attention_mask in zip(x.permute(1, 0, 2), mask.permute(1, 0, 2)):
+            #ic(sentence.size())
+            #ic(attention_mask.size())
             sent_enc = self.sentence_encoder(sentence, attention_mask)
+            #ic(f'SENT_ENC: {sent_enc.size()}')
             document_encoding.append(sent_enc)
 
         document_encoding = torch.cat(document_encoding, dim=1)
-
+        #ic(f'DOCUMENT_ENC:  {document_encoding.size()}')
         #Compute sentence-level mask by taking the max of row of the word dimension
         mask = torch.max(mask, dim=2)[0]
         #ic(document_encoding)
@@ -77,12 +80,15 @@ class SentenceAttention(nn.Module):
         self.attn_sentence_context = nn.Linear(self.attn_dim, 1, bias=False)
 
     def forward(self, x, mask):
+
         seq = torch.clone(x)
         # Apply linear transformation
         x = self.tanh(self.attn_sentence_linear(x))
+        #ic(f'ATTN SENT LINEAR: {x.size()}')
 
         # Compute dot product with context
         x = self.attn_sentence_context(x)
+        #ic(f'ATTN SENT CONTEXT: {x.size()}')
 
         #ic(x.size())
         #ic(mask.size())
@@ -91,10 +97,12 @@ class SentenceAttention(nn.Module):
 
         # Compute attention weights
         x = F.softmax(x, dim=1)
+        #ic(f'ATTN SENT NORMALIZED: {x.size()}')
 
         # Sum attention-weighted sentences
         x = seq * x
         x = torch.sum(x, dim=1, keepdim=True)
+        #ic(f'ATTN SENT SUM: {x.size()}')
 
         return x
 
@@ -112,7 +120,7 @@ class SentenceEncoder(nn.Module):
         self.dropout = dropout
         self.attn_dim = attn_dim
 
-        self.biGRU = nn.GRU(input_size=2*hidden_dim, hidden_size=hidden_dim, num_layers=num_layers, bidirectional=True,
+        self.biGRU = nn.GRU(input_size=2 * hidden_dim, hidden_size=hidden_dim, num_layers=num_layers, bidirectional=True,
                             batch_first=True, dropout=dropout)
         self.word_attention = WordAttention(hidden_dim, attn_dim)
         self.word_encoder = WordEncoder(embed_dim, hidden_dim, num_layers, dropout, embedder)
@@ -154,9 +162,10 @@ class WordAttention(nn.Module):
         seq = torch.clone(x)
         #Apply linear transformation
         x = self.tanh(self.attn_word_linear(x))
-
+        #ic(f'ATTN WORD LINEAR: {x.size()}')
         #Compute dot product with context
         x = self.attn_word_context(x)
+        #ic(f'ATTN WORD CONTEXT: {x.size()}')
 
         #ic(mask.size())
         #ic(mask)
@@ -166,6 +175,8 @@ class WordAttention(nn.Module):
         x[~(mask.unsqueeze(2))] = 10**(-10)
         #Compute attention weights
         x = F.softmax(x, dim=1)
+        #ic(f'ATTN WORD NORMALIZED: {x.size()}')
+
         #ic(x)
 
 
@@ -176,6 +187,7 @@ class WordAttention(nn.Module):
         #Sum attention-weighted words
         x = seq * x
         x = torch.sum(x, dim=1, keepdim=True)
+        #ic(f'ATTN WORD SUM: {x.size()}')
 
         return x
 

@@ -16,9 +16,6 @@ import torch
 import torch.nn as nn
 import argparse
 
-def super_collate_fn(model):
-
-    return collate_fn(model, )
 
 def collate_fn(embedding_model, batch):
     documents = [_[0] for _ in batch]
@@ -30,6 +27,7 @@ def main( num_epochs : int, optim_params : dict, train_set, test_set, val_set, m
 
     #Intialize model and transformer
     model = HAN(**model_config).to(device)
+    #print(model)
 
     #Initialize optimizer and scheduler
     optimizer = optim.Adam(model.parameters(), **optim_params)
@@ -38,7 +36,7 @@ def main( num_epochs : int, optim_params : dict, train_set, test_set, val_set, m
     num_depressed = train_set.dataset.num_depressed
     num_undepressed = train_set.dataset.num_undepressed
     total = num_depressed + num_undepressed
-    class_weights = torch.Tensor([total/(2*num_undepressed), (total/(2*num_depressed))]).to(device)
+    class_weights = torch.Tensor([1, 5]).to(device)
 
     cross_entropy = nn.CrossEntropyLoss(weight=class_weights)
 
@@ -85,13 +83,13 @@ if __name__ == '__main__':
         device = torch.device("cpu")
 
     print(device)
-    train_set_params = {'batch_size': 8, 'shuffle': True, 'num_workers': 0, 'pin_memory':True}
-    eval_set_params = {'num_workers': 0}
+    train_set_params = {'batch_size': 8, 'shuffle': True, 'num_workers': 2, 'pin_memory':True}
+    eval_set_params = {'batch_size':8, 'num_workers': 2}
 
     embedder = GensimEmbedder(embedding_model).to(device)
-    model_config = {'num_classes':2, 'embed_dim':embedding_model.vector_size, 'hidden_dim': 128, 'attn_dim':256, 'num_layers':2, 'dropout':0.25, 'embedder': embedder}
+    model_config = {'num_classes':2, 'embed_dim':embedding_model.vector_size, 'hidden_dim': 256, 'attn_dim':256, 'num_layers':2, 'dropout':0.25, 'embedder': embedder}
 
-    train_set = get_daicwoz_dataloader(args.train_csv_path, args.transcript_path, train_set_params, embedding_model)
+    train_set = get_daicwoz_dataloader(args.train_csv_path, args.transcript_path, train_set_params, embedding_model, oversample_minority=True)
     val_set =  get_daicwoz_dataloader(args.val_csv_path, args.transcript_path, eval_set_params, embedding_model)
     eval_set =  get_daicwoz_dataloader(args.eval_csv_path, args.transcript_path, eval_set_params, embedding_model, label_name='PHQ_Binary')
 

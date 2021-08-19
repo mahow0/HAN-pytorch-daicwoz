@@ -16,6 +16,7 @@ def evaluate(
     precision = Precision(average=False)
     recall = Recall(average=False)
     f1 = (precision * recall * 2 / (precision + recall)).mean()
+    batch_size = test_set.batch_size 
 
     for item in tqdm(test_set):
 
@@ -27,14 +28,17 @@ def evaluate(
         with torch.no_grad():
           # Feed the batch into the model
           output = model(input_ids, attention_mask)
+          effective_batch_size = output.size(0)
 
           #ic(output.size())
           #ic(softmax(output).size())
-          output = softmax(output).max(dim=0)[1].long()
+          output = softmax(output.squeeze(1)).max(dim=1, keepdim=True)[1].long()
+          #ic(output.size())
+          if effective_batch_size < batch_size:
+            batch_size = effective_batch_size
+          labels = labels.reshape((batch_size,)).long()
           #ic(output)
-          labels = labels.reshape((1,)).long()
-          ic(output)
-          ic(labels)
+          #ic(labels)
           acc.update((output, labels))
           precision.update((output, labels))
           recall.update((output, labels))
