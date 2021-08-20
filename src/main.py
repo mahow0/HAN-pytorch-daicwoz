@@ -87,7 +87,7 @@ if __name__ == '__main__':
     eval_set_params = {'batch_size':8, 'num_workers': 8}
 
     embedder = GensimEmbedder(embedding_model).to(device)
-    model_config = {'num_classes':2, 'embed_dim':embedding_model.vector_size, 'hidden_dim': 512, 'attn_dim':512, 'num_layers':2, 'dropout':0.2, 'embedder': embedder}
+    model_config = {'num_classes':2, 'embed_dim':embedding_model.vector_size, 'hidden_dim': 100, 'attn_dim':100, 'num_layers':2, 'dropout':0.2, 'embedder': embedder}
 
     train_set = get_daicwoz_dataloader(args.train_csv_path, args.transcript_path, train_set_params, embedding_model, oversample_minority=True)
     val_set =  get_daicwoz_dataloader(args.val_csv_path, args.transcript_path, eval_set_params, embedding_model)
