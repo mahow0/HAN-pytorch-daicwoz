@@ -57,8 +57,8 @@ def train(
             # Calculate and backpropagate loss, clip gradient norm
             output = output.squeeze(1)
             logits = log_softmax(output)
-            #ic(torch.max(logits,dim=1,keepdim=True)[1])
-            #ic(labels)
+            ic(torch.max(logits,dim=1,keepdim=True)[1])
+            ic(labels)
             loss = loss_fn(output, labels.long())
             #ic(output)
            # ic(labels)

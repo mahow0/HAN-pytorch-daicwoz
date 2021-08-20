@@ -31,7 +31,7 @@ class HAN(nn.Module):
         self.sentence_attention = SentenceAttention(hidden_dim=hidden_dim, attn_dim=attn_dim)
         self.sentence_encoder = SentenceEncoder(embed_dim=embed_dim, hidden_dim=hidden_dim, num_layers=num_layers,
                                                 dropout=dropout, attn_dim=attn_dim, embedder=embedder)
-
+        
         self.classifier = nn.Linear(2 * hidden_dim, num_classes, bias=True)
 
 
