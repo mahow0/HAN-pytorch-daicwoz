@@ -16,8 +16,15 @@ def train(
         scheduler: optim.lr_scheduler.ReduceLROnPlateau,
         num_epochs: int,
         loss_fn=nn.CrossEntropyLoss(),
-        device=torch.device('cpu')
+        device=torch.device('cpu'), 
+        grid_search = False
 ):
+    if grid_search: 
+      accs = []
+      precs = []
+      recalls = []
+      f1s = []
+
     # Set the model to training mode and fix the upper bound on gradient norm
     model.train()
     max_grad_norm = 1
@@ -89,11 +96,26 @@ def train(
             torch.cuda.empty_cache()
 
         acc, precision, recall, f1 = evaluate(model, validation_set, device=device)
+    
+        if grid_search:
+          accs.append(acc)
+          precs.append(precision)
+          recalls.append(recall)
+          f1s.append(f1)
+
         print(f'Accuracy: {acc}')
         print(f'Precision: {precision}')
         print(f'Recall: {recall}')
         print(f'F1: {f1}')
         model.train()
         scheduler.step(acc)
+
+    if grid_search:
+      acc = max(accs)
+      precision = max(precs)
+      recall = max(recalls)
+      f1 = max(f1s)
+      
+      return model, acc, precision, recall, f1 
 
     return model
