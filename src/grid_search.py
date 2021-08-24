@@ -13,7 +13,7 @@ val_csv_path = r'./drive/MyDrive/depression_text/LABELS/dev_split_Depression_AVE
 eval_csv_path =  r'./drive/MyDrive/depression_text/LABELS/full_test_split.csv' 
 transcript_path = r'./drive/MyDrive/depression_text/TRANSCRIPT'
 
-def grid_search(hidden_size_begin, hidden_size_end,lr_begin, lr_end, hidden_size_skip = 50, lr_skip = 0.001, num_epochs=1, cuda=True):
+def grid_search(hidden_size_begin, hidden_size_end,lr_begin, lr_end, hidden_size_skip = 50, lr_skip = 0.01, num_epochs=20, cuda=True):
 
   embedding_model = get_pretrained_word2vec()
     #embedding_model = get_pretrained_glove()
@@ -41,6 +41,7 @@ def grid_search(hidden_size_begin, hidden_size_end,lr_begin, lr_end, hidden_size
 
   results = []
   for hidden_size in range(hidden_size_begin, hidden_size_end, hidden_size_skip):
+
     for lr in np.arange(lr_begin, lr_end, lr_skip):
     
       model_config = {'num_classes':2, 'embed_dim':embedding_model.vector_size, 'hidden_dim': hidden_size, 'attn_dim': hidden_size, 'num_layers':2, 'dropout':0.2, 'embedder': embedder}
@@ -58,6 +59,11 @@ def grid_search(hidden_size_begin, hidden_size_end,lr_begin, lr_end, hidden_size
       del model
       gc.collect()
       torch.cuda.empty_cache()
+      file_name = f'HAN_log.txt'
+      lines = [f'Hidden size: {hidden_size}\n', f'Learning rate: {lr}\n', f'acc: {acc}\n', f'precision: {precision}\n', f'recall: {recall}\n', f'f1: {f1}\n', '\n\n']
+      with open(f'/content/drive/MyDrive/HAN-logs/{file_name}', 'a') as f:
+        f.writelines(lines)
+
   
   return results
 
