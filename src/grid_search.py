@@ -56,10 +56,10 @@ def grid_search(hidden_size_begin, hidden_size_end,lr_begin, lr_end, hidden_size
       #print(eval_set.dataset[0])
       model, epoch_profiles = train(model, train_set, val_set, optimizer = optimizer, scheduler=scheduler, num_epochs = num_epochs, device=device, loss_fn = cross_entropy, grid_search = True)
 
-      max_acc = reversed(sorted(epoch_profiles, key = lambda s : s['acc']))[0]
-      max_precision = reversed(sorted(epoch_profiles, key = lambda s : s['precision']))[0]
-      max_recall = reversed(sorted(epoch_profiles, key = lambda s : s['recall']))[0]
-      max_f1 = reversed(sorted(epoch_profiles, key = lambda s : s['f1']))[0]
+      max_acc = sorted(epoch_profiles, key = lambda s : s['acc'])[::-1][0]
+      max_precision = sorted(epoch_profiles, key = lambda s : s['precision'])[::-1][0]
+      max_recall = sorted(epoch_profiles, key = lambda s : s['recall'])[::-1][0]
+      max_f1 = sorted(epoch_profiles, key = lambda s : s['f1'])[::-1][0]
 
       acc = max_acc['acc']
       precision = max_precision['precision']
