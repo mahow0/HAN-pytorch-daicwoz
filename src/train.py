@@ -20,7 +20,7 @@ def train(
         grid_search = False
 ):
     if grid_search:
-      epcoh_profiles = []
+      epoch_profiles = []
       #accs = []
       #precs = []
       #recalls = []
