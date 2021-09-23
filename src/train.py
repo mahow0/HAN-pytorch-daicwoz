@@ -19,11 +19,12 @@ def train(
         device=torch.device('cpu'), 
         grid_search = False
 ):
-    if grid_search: 
-      accs = []
-      precs = []
-      recalls = []
-      f1s = []
+    if grid_search:
+      epcoh_profiles = []
+      #accs = []
+      #precs = []
+      #recalls = []
+      #f1s = []
 
     # Set the model to training mode and fix the upper bound on gradient norm
     model.train()
@@ -98,10 +99,12 @@ def train(
         acc, precision, recall, f1 = evaluate(model, validation_set, device=device)
     
         if grid_search:
-          accs.append(acc)
-          precs.append(precision)
-          recalls.append(recall)
-          f1s.append(f1)
+          profile = {'acc':acc, 'precision':precision, 'recall':recall, 'f1':f1}
+          epoch_profiles.append(profile)
+          #accs.append(acc)
+          #precs.append(precision)
+          #recalls.append(recall)
+          #f1s.append(f1)
 
         print(f'Accuracy: {acc}')
         print(f'Precision: {precision}')
@@ -111,11 +114,6 @@ def train(
         scheduler.step(acc)
 
     if grid_search:
-      acc = max(accs)
-      precision = max(precs)
-      recall = max(recalls)
-      f1 = max(f1s)
-      
-      return model, acc, precision, recall, f1 
+      return model, epoch_profiles
 
     return model

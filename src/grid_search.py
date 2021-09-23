@@ -1,6 +1,7 @@
 import sys
 sys.path.insert(1, '/content/HAN-pytorch-daicwoz/utils')
 sys.path.insert(1, '/content/HAN-pytorch-daicwoz/src')
+import torch
 from train import * 
 import numpy as np
 from daicwoz_dataloader import get_daicwoz_dataloader, get_daicwoz_dataset
@@ -53,14 +54,29 @@ def grid_search(hidden_size_begin, hidden_size_end,lr_begin, lr_end, hidden_size
       optimizer = optim.Adam(model.parameters(), **optim_params)
       scheduler = optim.lr_scheduler.ReduceLROnPlateau(optimizer, mode='min', factor=0.1, patience=3, cooldown=1, verbose=False, threshold=0.001)
       #print(eval_set.dataset[0])
-      model, acc, precision, recall, f1 = train(model, train_set, val_set, optimizer = optimizer, scheduler=scheduler, num_epochs = num_epochs, device=device, loss_fn = cross_entropy, grid_search = True)
+      model, epoch_profiles = train(model, train_set, val_set, optimizer = optimizer, scheduler=scheduler, num_epochs = num_epochs, device=device, loss_fn = cross_entropy, grid_search = True)
+
+      max_acc = reversed(sorted(epoch_profiles, key = lambda s : s['acc']))[0]
+      max_precision = reversed(sorted(epoch_profiles, key = lambda s : s['precision']))[0]
+      max_recall = reversed(sorted(epoch_profiles, key = lambda s : s['recall']))[0]
+      max_f1 = reversed(sorted(epoch_profiles, key = lambda s : s['f1']))[0]
+
+      acc = max_acc['acc']
+      precision = max_precision['precision']
+      recall = max_recall['recall']
+      f1 = max_f1['f1']
+
+
       profile = {'hidden_dim':hidden_size, 'lr': lr, 'acc':acc, 'precision':precision, 'recall':recall, 'f1':f1}
       results.append(profile)
+      torch.save(model.state_dict(), f'/content/drive/MyDrive/HAN-logs/hdim_{hidden_size}_lr_{lr}.pt')
+      
       del model
       gc.collect()
       torch.cuda.empty_cache()
       file_name = f'HAN_log.txt'
-      lines = [f'Hidden size: {hidden_size}\n', f'Learning rate: {lr}\n', f'acc: {acc}\n', f'precision: {precision}\n', f'recall: {recall}\n', f'f1: {f1}\n', '\n\n']
+      summary_lines = [f'Hidden size: {hidden_size}\n', f'Learning rate: {lr}\n', f'Max acc: {acc}\n', f'Max precision: {precision}\n', f'Max recall: {recall}\n', f'Max f1: {f1}\n', '\n\n']
+      detailed_stats = [f'Max acc profile: {max_acc}\n', f'Max precision profile: {max_precision}\n', f'Max recall profile: {max_recall}\n', f'Max f1 profile: {max_f1}\n']
       with open(f'/content/drive/MyDrive/HAN-logs/{file_name}', 'a') as f:
         f.writelines(lines)
 
