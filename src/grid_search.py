@@ -70,7 +70,7 @@ def grid_search(hidden_size_begin, hidden_size_end,lr_begin, lr_end, hidden_size
       profile = {'hidden_dim':hidden_size, 'lr': lr, 'acc':acc, 'precision':precision, 'recall':recall, 'f1':f1}
       results.append(profile)
       torch.save(model.state_dict(), f'/content/drive/MyDrive/HAN-logs/hdim_{hidden_size}_lr_{lr}.pt')
-      
+
       del model
       gc.collect()
       torch.cuda.empty_cache()
@@ -87,7 +87,7 @@ def grid_search(hidden_size_begin, hidden_size_end,lr_begin, lr_end, hidden_size
 
 if __name__ == '__main__':
   
-  results = grid_search(100, 300, 0.005, 0.08)
+  results = grid_search(64, 128, 0.001, 0.08)
   max_acc = sorted(results, key= lambda s : s['acc'])[::-1][0]
   max_prec = sorted(results, key = lambda s : s['precision'])[::-1][0]
   max_recall = sorted(results, key = lambda s : s['recall'])[::-1][0]
