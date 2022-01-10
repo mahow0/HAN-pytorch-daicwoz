@@ -1,5 +1,5 @@
 import sys
-sys.path.insert(1, '/content/HAN-pytorch-daicwoz/utils')
+sys.path.insert(1, '/HAN-pytorch-daicwoz/utils')
 sys.path.insert(1, '/content/HAN-pytorch-daicwoz/src')
 
 import torch
@@ -7,7 +7,6 @@ import torch.nn as nn
 import torch.nn.functional as F
 from torch.nn.utils.rnn import pack_padded_sequence, pad_packed_sequence
 import gensim.downloader
-import numpy as np
 from embeddings import GensimEmbedder
 from tokenizer import collate_documents
 from icecream import ic
@@ -220,8 +219,8 @@ class WordEncoder(nn.Module):
 
         max_length = x.size(1)
         x = self.embed(x)
-        device = x.get_device()
-
+        device = x.device 
+        
         clamped_lengths = torch.Tensor(lengths).clamp(min=1)
         packed_input = pack_padded_sequence(x, clamped_lengths, batch_first=True, enforce_sorted=False)
 

@@ -27,7 +27,7 @@ def train(
 
     # Set the model to training mode and fix the upper bound on gradient norm
     model.train()
-    max_grad_norm = 1
+    max_grad_norm = 2
     log_softmax = nn.LogSoftmax()
 
     # Obtain the number of training examples
@@ -64,8 +64,8 @@ def train(
             # Calculate and backpropagate loss, clip gradient norm
             output = output.squeeze(1)
             logits = log_softmax(output)
-            ic(torch.max(logits,dim=1,keepdim=True)[1])
-            ic(labels)
+            #ic(torch.max(logits,dim=1,keepdim=True)[1])
+            #ic(labels)
             loss = loss_fn(output, labels.long())
             #ic(output)
            # ic(labels)
@@ -83,6 +83,7 @@ def train(
                 {"Batch": f"{current_batch}/{num_batches}", "Loss": loss.item()}
             )
             # Clear the GPU memory of batch that we no longer need
+            
             input_ids.detach()
             attention_mask.detach()
             labels.detach()

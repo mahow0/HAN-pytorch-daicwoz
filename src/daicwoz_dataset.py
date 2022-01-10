@@ -71,9 +71,7 @@ class DAICWOZ_Dataset(HAN_Dataset):
         self.documents = temp_transcripts
         self.labels = temp_labels
 
-    def save(self, file_path):
-        with open(file_path, 'wb') as file:
-            pkl.dump(self, file)
+
 
 
 

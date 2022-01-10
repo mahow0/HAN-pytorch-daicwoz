@@ -7,7 +7,6 @@ sys.path.insert(1, '/content/HAN-pytorch-daicwoz/src')
 from evaluate import evaluate
 from train import *
 from transformers import AutoTokenizer
-from daicwoz_dataloader import get_daicwoz_dataloader, get_daicwoz_dataset
 from embeddings import get_pretrained_word2vec, get_pretrained_glove, GensimEmbedder
 from model import HAN
 from tokenizer import collate_documents
@@ -33,10 +32,10 @@ def main( num_epochs : int, optim_params : dict, train_set, test_set, val_set, m
     optimizer = optim.Adam(model.parameters(), **optim_params)
     scheduler = optim.lr_scheduler.ReduceLROnPlateau(optimizer, mode='min', factor=0.1, patience=3, cooldown=1, verbose=False, threshold=0.001)
 
-    num_depressed = train_set.dataset.num_depressed
-    num_undepressed = train_set.dataset.num_undepressed
-    total = num_depressed + num_undepressed
-    class_weights = torch.Tensor([1, 1]).to(device)
+    #num_depressed = train_set.dataset.num_depressed
+    #num_undepressed = train_set.dataset.num_undepressed
+    #total = num_depressed + num_undepressed
+    #class_weights = torch.Tensor([1, 1]).to(device)
 
     cross_entropy = nn.CrossEntropyLoss(weight=class_weights)
 
@@ -83,8 +82,8 @@ if __name__ == '__main__':
         device = torch.device("cpu")
 
     print(device)
-    train_set_params = {'batch_size': 8, 'shuffle': True, 'num_workers': 8, 'pin_memory':True}
-    eval_set_params = {'batch_size':8, 'num_workers': 8}
+    train_set_params = {'batch_size': 8, 'shuffle': True, 'num_workers': 4, 'pin_memory':True}
+    eval_set_params = {'batch_size':8, 'num_workers': 4}
 
     embedder = GensimEmbedder(embedding_model).to(device)
     model_config = {'num_classes':2, 'embed_dim':embedding_model.vector_size, 'hidden_dim': 100, 'attn_dim':100, 'num_layers':2, 'dropout':0.2, 'embedder': embedder}
