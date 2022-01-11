@@ -31,13 +31,13 @@ def evaluate(
 
           #ic(softmax(output).size())
           output = softmax(output.squeeze(1)).max(dim=1, keepdim=True)[1].long()
-          output_batches.append(output)
+          output_batches.append(output.cpu())
 
           if effective_batch_size < batch_size:
             batch_size = effective_batch_size
 
           labels = labels.reshape((batch_size, 1)).long()
-          label_batches.append(labels)
+          label_batches.append(labels.cpu())
           #ic(output)
           #ic(labels)
  
