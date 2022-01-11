@@ -67,7 +67,9 @@ if __name__ == '__main__':
   parser = argparse.ArgumentParser()
   parser.add_argument('--yelp_reviews', type=str, help='path to json file')
   parser.add_argument('--total_reviews', type=int, default=50000, help='path to json file')
-  results = yelp_grid_search(yelp_reviews, total_reviews, 50, 300, 0.005, 0.08)
+  args = parser.parse_args()
+
+  results = yelp_grid_search(args.yelp_reviews, args.total_reviews, 50, 300, 0.005, 0.08)
 
   max_acc = sorted(results, key= lambda s : s['acc'])[::-1][0]
   max_prec = sorted(results, key = lambda s : s['precision'])[::-1][0]
