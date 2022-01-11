@@ -1,7 +1,6 @@
 import torch
 import torch.nn as nn
 from torch.utils.data import DataLoader
-from ignite.metrics import Accuracy, Precision, Recall
 from sklearn.metrics import classification_report
 import numpy as np
 from tqdm import tqdm
