@@ -13,7 +13,7 @@ from model import HAN
 import gc
 
 
-def yelp_grid_search(yelp_reviews, total_reviews, hidden_size_begin, hidden_size_end,lr_begin, lr_end, hidden_size_skip = 50, lr_skip = 0.01, num_epochs=20, cuda=True):
+def yelp_grid_search(yelp_reviews, total_reviews, hidden_size_begin, hidden_size_end,lr_begin, lr_end, hidden_size_skip = 50, lr_skip = 0.01, num_epochs=5, cuda=True):
 
   embedding_model = get_pretrained_word2vec()
 
